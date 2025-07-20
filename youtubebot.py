@@ -35,7 +35,8 @@ def mainfun(id,question):
     load_dotenv()
     llm=HuggingFaceEndpoint(
         repo_id='moonshotai/Kimi-K2-Instruct',
-        task = 'text-generation'
+        task = 'text-generation',
+        huggingfacehub_api_token='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'
         )
     model = ChatHuggingFace(llm=llm)
 
