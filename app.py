@@ -15,6 +15,7 @@ import streamlit as st
 import requests
 import os
 from functools import partial
+
 load_dotenv()
 SCRAPERAPI_KEY = os.getenv("SCRAPERAPI_KEY")  # Put your key in .env
 if not SCRAPERAPI_KEY:
@@ -35,7 +36,7 @@ proxy_config = GenericProxyConfig(
     http_url=f"http://scraperapi:{SCRAPERAPI_KEY}@proxy-server.scraperapi.com:8001",
     https_url=f"http://scraperapi:{SCRAPERAPI_KEY}@proxy-server.scraperapi.com:8001"
 )
-ytt_api = YouTubeTranscriptApi(proxy_config=proxy_config, cookies=cookies)
+ytt_api = YouTubeTranscriptApi(proxy_config=proxy_config)
 
 def mainfun(id,question):
     try:
