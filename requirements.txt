@@ -1,7 +1,6 @@
 attr==0.3.2
 ConfigParser==7.2.0
 Cython
-pyjnius
 cryptography==45.0.5
 docutils==0.21.2
 filelock==3.18.0
