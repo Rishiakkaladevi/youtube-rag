@@ -12,18 +12,6 @@ from langchain_core.output_parsers import StrOutputParser
 import streamlit as st
 import requests
 import os
-from functools import partial
-
-SCRAPERAPI_KEY = os.getenv("SCRAPERAPI_KEY")  # Put your key in .env or hardcode it here
-proxy = {
-    "http": f"http://scraperapi:{SCRAPERAPI_KEY}@proxy-server.scraperapi.com:8001",
-    "https": f"http://scraperapi:{SCRAPERAPI_KEY}@proxy-server.scraperapi.com:8001",
-}
-cookies = {"CONSENT": "YES+1"}
-
-# Monkey patch requests.get to always use proxy + cookie
-requests.get = partial(requests.get, proxies=proxy, cookies=cookies, timeout=10)
-
 
 
 def mainfun(id,question):
