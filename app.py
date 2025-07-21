@@ -1,5 +1,5 @@
-from youtube_transcript_api import YouTubeTranscriptApi , TranscriptsDisabled, _errors
-from youtube_transcript_api.proxies import GenericProxyConfig
+from youtube_transcript_api import YouTubeTranscriptApi , _errors
+
 
 
 from langchain_core.runnables import RunnablePassthrough,RunnableParallel,RunnableLambda
@@ -12,32 +12,9 @@ from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
 from langchain_core.prompts.prompt import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 import streamlit as st
-import requests
-import os
-from functools import partial
+
 
 load_dotenv()
-SCRAPERAPI_KEY = os.getenv("SCRAPERAPI_KEY")  # Put your key in .env
-if not SCRAPERAPI_KEY:
-    raise ValueError("SCRAPERAPI_KEY environment variable is not set")
-
-# Configure proxy for ScraperAPI
-proxy = {
-    "http": f"http://scraperapi:{SCRAPERAPI_KEY}@proxy-server.scraperapi.com:8001",
-    "https": f"http://scraperapi:{SCRAPERAPI_KEY}@proxy-server.scraperapi.com:8001",
-}
-cookies = {"CONSENT": "YES+1"}
-
-# Monkey patch requests.get to always use proxy + cookie (retained from original)
-requests.get = partial(requests.get, proxies=proxy, cookies=cookies, timeout=10)
-
-# Configure YouTubeTranscriptApi with proxied requests
-proxy_config = GenericProxyConfig(
-    http_url=f"http://scraperapi:{SCRAPERAPI_KEY}@proxy-server.scraperapi.com:8001",
-    https_url=f"http://scraperapi:{SCRAPERAPI_KEY}@proxy-server.scraperapi.com:8001"
-)
-ytt_api = YouTubeTranscriptApi(proxy_config=proxy_config)
-
 def mainfun(id,question):
     try:
         transcript_data = YouTubeTranscriptApi.get_transcript(video_id, languages=['en'])
