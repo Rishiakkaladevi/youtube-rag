@@ -1,35 +1,29 @@
-# Base image with Python
-FROM python:3.9-slim
+# Use a stable Python image
+FROM python:3.10-slim
 
-# Install system-level dependencies
+# Install system packages
 RUN apt-get update && \
     apt-get install -y \
-    openjdk-17-jdk \
     build-essential \
     curl \
     git \
     && apt-get clean
 
-# Set Java environment variables (required for pyjnius)
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-ENV PATH="${JAVA_HOME}/bin:$PATH"
-
 # Set working directory
 WORKDIR /app
 
-# Copy requirements and install
+# Copy requirements and install them
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
-    pip install Cython && \
     pip install -r requirements.txt
 
-# Copy app code
+# Copy app source code
 COPY . .
 
-# Expose port for Streamlit (Render uses 10000)
+# Expose the Streamlit port (Render uses 10000)
 EXPOSE 10000
 
-# Streamlit environment settings
+# Streamlit config
 ENV STREAMLIT_SERVER_PORT=10000
 ENV STREAMLIT_SERVER_ENABLECORS=false
 
