@@ -1,4 +1,5 @@
-from youtube_transcript_api import YouTubeTranscriptApi , TranscriptsDisabled
+from youtube_transcript_api import YouTubeTranscriptApi , TranscriptsDisabled, _errors
+
 from langchain_core.runnables import RunnablePassthrough,RunnableParallel,RunnableLambda
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_groq import ChatGroq
@@ -9,13 +10,34 @@ from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
 from langchain_core.prompts.prompt import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 import streamlit as st
+import requests
+import os
+from functools import partial
+
+SCRAPERAPI_KEY = os.getenv("SCRAPERAPI_KEY")  # Put your key in .env or hardcode it here
+proxy = {
+    "http": f"http://scraperapi:{SCRAPERAPI_KEY}@proxy-server.scraperapi.com:8001",
+    "https": f"http://scraperapi:{SCRAPERAPI_KEY}@proxy-server.scraperapi.com:8001",
+}
+cookies = {"CONSENT": "YES+1"}
+
+# Monkey patch requests.get to always use proxy + cookie
+requests.get = partial(requests.get, proxies=proxy, cookies=cookies, timeout=10)
+
+
+
 def mainfun(id,question):
     try:
-        transcriptlist=YouTubeTranscriptApi.get_transcript(video_id=id,languages=['en'])
-        transcript = ' '.join(x['text'] for x in transcriptlist)
-        print(transcript)
-    except TranscriptsDisabled:
-        print("captions for this video are not available")
+        transcript_data = YouTubeTranscriptApi.get_transcript(video_id, languages=['en'])
+        transcript = ' '.join([x['text'] for x in transcript_data])
+    except _errors.TranscriptsDisabled:
+        return "Captions are disabled for this video."
+    except _errors.VideoUnavailable:
+        return "The video is unavailable."
+    except _errors.IpBlocked:
+        return "Your IP (or proxy) is blocked by YouTube. Try again later."
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size = 1000, chunk_overlap=50)
